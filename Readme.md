@@ -25,13 +25,31 @@ require("kanji").setup()
 
 Signs will automatically appear in the signcolumn for files in a jj repository.
 
+## Configuration
+
+Customize sign text:
+
+```lua
+require("kanji").setup({
+  signs = {
+    add = { text = "+" },
+    change = { text = "~" },
+    delete = { text = "-" },
+  },
+})
+```
+
+Default sign text: `A` (add), `M` (change), `D` (delete)
+
 ## Signs
 
-| Sign | Text | Type |
-|------|------|------|
-| `kanji_add` | A | Added lines |
-| `kanji_change` | M | Modified lines |
-| `kanji_delete` | D | Deleted lines |
+Signs use Neovim's built-in highlight groups:
+
+| Sign | Text | Highlight |
+|------|------|----------|
+| `kanji_add` | A | `DiffAdd` |
+| `kanji_change` | M | `DiffChange` |
+| `kanji_delete` | D | `DiffDelete` |
 
 ## Features
 

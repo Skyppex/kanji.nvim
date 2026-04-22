@@ -1,29 +1,30 @@
 local M = {}
 
-local SIGNS = {
-	add = { text = "A", name = "kanji_add", hl = "KanjiAdd" },
-	change = { text = "M", name = "kanji_change", hl = "KanjiChange" },
-	delete = { text = "D", name = "kanji_delete", hl = "KanjiDelete" },
+local HL_MAP = {
+	add = "DiffAdd",
+	change = "DiffChange",
+	delete = "DiffDelete",
 }
 
-function M.define()
-	for _, sig in pairs(SIGNS) do
-		vim.fn.sign_define(sig.name, {
-			text = sig.text,
-			texthl = sig.hl,
+function M.setup(config)
+	for sig_type, sig_opts in pairs(config.signs) do
+		local name = "kanji_" .. sig_type
+		local hl = HL_MAP[sig_type]
+
+		vim.fn.sign_define(name, {
+			text = sig_opts.text,
+			texthl = hl,
 		})
 	end
 end
 
 function M.place(bufnr, signs)
 	for _, sign in ipairs(signs) do
-		local sig = SIGNS[sign.type]
-		if sig then
-			vim.fn.sign_place(0, "kanji", sig.name, bufnr, {
-				lnum = sign.line,
-				id = sign.line,
-			})
-		end
+		local name = "kanji_" .. sign.type
+		vim.fn.sign_place(0, "kanji", name, bufnr, {
+			lnum = sign.line,
+			id = sign.line,
+		})
 	end
 end
 

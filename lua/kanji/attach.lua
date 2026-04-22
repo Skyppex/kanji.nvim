@@ -66,8 +66,8 @@ function M.attach(bufnr)
 	})
 end
 
-function M.init()
-	signs.define()
+function M.init(config)
+	signs.setup(config)
 
 	vim.api.nvim_create_autocmd("BufReadPost", {
 		pattern = "*",
