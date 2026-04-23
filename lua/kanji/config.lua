@@ -1,5 +1,15 @@
 local M = {}
 
+--- @class KanjiOpts
+--- @field signs KanjiSignsOpts
+---
+--- @class KanjiSignsOpts
+--- @field add KanjiSignOpts
+---
+--- @class KanjiSignOpts
+--- @field text string
+
+--- @type KanjiOpts
 M.defaults = {
 	signs = {
 		add = { text = "A" },
@@ -8,6 +18,7 @@ M.defaults = {
 	},
 }
 
+--- @param user_opts KanjiOpts
 function M.merge(user_opts)
 	user_opts = user_opts or {}
 	local config = vim.deepcopy(M.defaults)
@@ -24,3 +35,4 @@ function M.merge(user_opts)
 end
 
 return M
+

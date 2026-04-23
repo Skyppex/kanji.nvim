@@ -1,5 +1,24 @@
 local M = {}
 
+local function calc_group_type(group)
+	local has_add = false
+	local has_delete = false
+	for _, l in ipairs(group) do
+		if l.type == "add" then
+			has_add = true
+		elseif l.type == "delete" then
+			has_delete = true
+		end
+	end
+	if has_add and has_delete then
+		return "change"
+	end
+	if has_add then
+		return "add"
+	end
+	return "delete"
+end
+
 function M.parse(diff_output)
 	if not diff_output or #diff_output == 0 then
 		return {}
@@ -13,33 +32,65 @@ function M.parse(diff_output)
 		if old_start then
 			table.insert(hunks, {
 				new_start = tonumber(new_start),
-				lines = {},
+				groups = {},
+				current_group = {},
 			})
 			line_in_file = tonumber(new_start, 10)
 		elseif hunks[#hunks] then
 			local first = line:sub(1, 1)
+			local hunk = hunks[#hunks]
+
 			if first == "+" then
-				table.insert(hunks[#hunks].lines, {
+				table.insert(hunk.current_group, {
 					type = "add",
 					text = line:sub(2),
 					line = line_in_file,
 				})
 				line_in_file = line_in_file + 1
 			elseif first == "-" then
-				table.insert(hunks[#hunks].lines, {
+				table.insert(hunk.current_group, {
 					type = "delete",
 					text = line:sub(2),
 					line = line_in_file,
 				})
 			elseif first == " " then
-				table.insert(hunks[#hunks].lines, {
-					type = "context",
-					text = line:sub(2),
-					line = line_in_file,
-				})
+				if #hunk.current_group > 0 then
+					local group_type = calc_group_type(hunk.current_group)
+					local group_lines = {}
+					for _, l in ipairs(hunk.current_group) do
+						table.insert(group_lines, {
+							line = l.line,
+							text = l.text,
+						})
+					end
+					table.insert(hunk.groups, {
+						type = group_type,
+						lines = group_lines,
+					})
+					hunk.current_group = {}
+				end
 				line_in_file = line_in_file + 1
 			end
 		end
+	end
+
+	-- save final group in each hunk
+	for _, hunk in ipairs(hunks) do
+		if #hunk.current_group > 0 then
+			local group_type = calc_group_type(hunk.current_group)
+			local group_lines = {}
+			for _, l in ipairs(hunk.current_group) do
+				table.insert(group_lines, {
+					line = l.line,
+					text = l.text,
+				})
+			end
+			table.insert(hunk.groups, {
+				type = group_type,
+				lines = group_lines,
+			})
+		end
+		hunk.current_group = nil
 	end
 
 	return hunks
@@ -50,18 +101,12 @@ function M.get_signs(diff_output)
 	local signs = {}
 
 	for _, hunk in ipairs(hunks) do
-		local seen = {}
-		for _, line in ipairs(hunk.lines) do
-			if line.type == "add" or line.type == "delete" then
-				if seen[line.line] then
-					seen[line.line].type = "change"
-				else
-					seen[line.line] = {
-						line = line.line,
-						type = line.type,
-					}
-					table.insert(signs, seen[line.line])
-				end
+		for _, group in ipairs(hunk.groups) do
+			for _, l in ipairs(group.lines) do
+				table.insert(signs, {
+					line = l.line,
+					type = group.type,
+				})
 			end
 		end
 	end
@@ -70,3 +115,4 @@ function M.get_signs(diff_output)
 end
 
 return M
+

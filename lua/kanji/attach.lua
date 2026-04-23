@@ -66,6 +66,7 @@ function M.attach(bufnr)
 	})
 end
 
+--- @param config KanjiOpts
 function M.init(config)
 	signs.setup(config)
 
@@ -94,3 +95,4 @@ function M.init(config)
 end
 
 return M
+
