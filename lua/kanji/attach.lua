@@ -8,6 +8,7 @@ M.attached_buffers = {}
 
 function M.refresh(bufnr)
 	local path = vim.api.nvim_buf_get_name(bufnr)
+
 	if not path or path == "" then
 		return
 	end
@@ -23,21 +24,6 @@ function M.refresh(bufnr)
 		end)
 	end)
 end
-
-local function debounce(fn, delay)
-	local timer = vim.uv.new_timer()
-	return function(...)
-		local argv = { ... }
-		timer:start(delay, 0, function()
-			timer:close()
-			vim.schedule_wrap(fn)(unpack(argv))
-		end)
-	end
-end
-
-local debounced_refresh = debounce(function(bufnr)
-	M.refresh(bufnr)
-end, 100)
 
 function M.attach(bufnr)
 	if M.attached_buffers[bufnr] then
@@ -58,7 +44,7 @@ function M.attach(bufnr)
 
 	vim.api.nvim_buf_attach(bufnr, false, {
 		on_lines = function()
-			debounced_refresh(bufnr)
+			M.refresh(bufnr)
 		end,
 		on_reload = function()
 			M.refresh(bufnr)
@@ -87,6 +73,20 @@ function M.init(config)
 	vim.api.nvim_create_autocmd("FocusGained", {
 		pattern = "*",
 		callback = function()
+			local buffers = vim.api.nvim_list_bufs()
+
+			for attached_bufnr, _ in pairs(M.attached_buffers) do
+				for _, bufnr in ipairs(buffers) do
+					if attached_bufnr == bufnr then
+						goto continue
+					end
+				end
+
+				M.attached_buffers[attached_bufnr] = nil
+
+				::continue::
+			end
+
 			for bufnr, _ in pairs(M.attached_buffers) do
 				M.refresh(bufnr)
 			end
@@ -95,4 +95,3 @@ function M.init(config)
 end
 
 return M
-
