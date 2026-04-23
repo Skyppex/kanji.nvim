@@ -6,8 +6,9 @@ local HL_MAP = {
 	delete = "DiffDelete",
 }
 
---- @param config KanjiOpts
-function M.setup(config)
+function M.setup()
+	local config = require("kanji.config").config
+
 	for sig_type, sig_opts in pairs(config.signs) do
 		local name = "kanji_" .. sig_type
 		local hl = HL_MAP[sig_type]
@@ -34,4 +35,3 @@ function M.clear(bufnr)
 end
 
 return M
-

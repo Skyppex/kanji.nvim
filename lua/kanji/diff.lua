@@ -61,6 +61,7 @@ function M.parse(diff_output)
 						table.insert(group_lines, {
 							line = l.line,
 							text = l.text,
+							type = l.type,
 						})
 					end
 					table.insert(hunk.groups, {
@@ -83,6 +84,7 @@ function M.parse(diff_output)
 				table.insert(group_lines, {
 					line = l.line,
 					text = l.text,
+					type = l.type,
 				})
 			end
 			table.insert(hunk.groups, {

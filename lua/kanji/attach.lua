@@ -1,5 +1,6 @@
 local M = {}
 
+local config = require("kanji.config").config
 local repo = require("kanji.repo")
 local diff = require("kanji.diff")
 local signs = require("kanji.signs")
@@ -52,8 +53,7 @@ function M.attach(bufnr)
 	})
 end
 
---- @param config KanjiOpts
-function M.init(config)
+function M.init()
 	signs.setup(config)
 
 	vim.api.nvim_create_autocmd("BufReadPost", {

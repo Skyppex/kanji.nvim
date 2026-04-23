@@ -1,14 +1,18 @@
 local M = {}
 
 local attach = require("kanji.attach")
+local preview = require("kanji.preview")
 
 --- @param opts KanjiOpts
 function M.setup(opts)
-	local config = require("kanji.config").merge(opts)
-	attach.init(config)
+	require("kanji.config").configure(opts)
+	attach.init()
 end
 
 function M.next_hunk()
+	local previewing = preview.is_previewing()
+	preview.close()
+
 	local bufnr = vim.api.nvim_get_current_buf()
 	local cursor = vim.fn.line(".")
 	local path = vim.api.nvim_buf_get_name(bufnr)
@@ -46,6 +50,11 @@ function M.next_hunk()
 			for _, lnum in ipairs(group_starts) do
 				if lnum > cursor and lnum >= 1 and lnum <= max_line then
 					vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+
+					if previewing then
+						preview.toggle()
+					end
+
 					return
 				end
 			end
@@ -54,6 +63,10 @@ function M.next_hunk()
 				local lnum = math.min(group_starts[#group_starts], max_line)
 				if lnum >= 1 then
 					vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+
+					if previewing then
+						preview.toggle()
+					end
 				end
 			end
 		end)
@@ -61,6 +74,9 @@ function M.next_hunk()
 end
 
 function M.prev_hunk()
+	local previewing = preview.is_previewing()
+	preview.close()
+
 	local bufnr = vim.api.nvim_get_current_buf()
 	local cursor = vim.fn.line(".")
 	local path = vim.api.nvim_buf_get_name(bufnr)
@@ -99,6 +115,11 @@ function M.prev_hunk()
 				local lnum = group_starts[i]
 				if lnum < cursor and lnum >= 1 and lnum <= max_line then
 					vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+
+					if previewing then
+						preview.toggle()
+					end
+
 					return
 				end
 			end
@@ -107,10 +128,22 @@ function M.prev_hunk()
 				local lnum = math.min(group_starts[1], max_line)
 				if lnum >= 1 then
 					vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+
+					if previewing then
+						preview.toggle()
+					end
 				end
 			end
 		end)
 	end)
+end
+
+function M.preview_hunk()
+	preview.toggle()
+end
+
+function M.close_preview()
+	preview.close()
 end
 
 return M
