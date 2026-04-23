@@ -2,11 +2,17 @@ local M = {}
 
 local attach = require("kanji.attach")
 local preview = require("kanji.preview")
+local blame = require("kanji.blame")
 
 --- @param opts KanjiOpts
 function M.setup(opts)
 	require("kanji.config").configure(opts)
 	attach.init()
+
+	local config = require("kanji.config").config
+	if config.blame and config.blame.enabled then
+		blame.enable()
+	end
 end
 
 function M.next_hunk()
@@ -144,6 +150,11 @@ end
 
 function M.close_preview()
 	preview.close()
+end
+
+function M.blame_toggle()
+	vim.notify("1")
+	blame.toggle()
 end
 
 return M

@@ -4,6 +4,7 @@ local M = {}
 --- @field signs KanjiSignsOpts
 --- @field preview KanjiPreviewOpts
 --- @field hooks KanjiHooksOpts
+--- @field blame KanjiBlameOpts
 
 --- @class KanjiSignsOpts
 --- @field add KanjiSignOpts
@@ -17,6 +18,11 @@ local M = {}
 --- @class KanjiHooksOpts
 --- @field on_preview_show fun(bufnr: number)?
 --- @field on_preview_focus fun(bufnr: number)?
+
+--- @class KanjiBlameOpts
+--- @field inline_template string
+--- @field inline_separator string
+--- @field enabled boolean
 
 --- @type KanjiOpts
 M.defaults = {
@@ -32,6 +38,11 @@ M.defaults = {
 			row = 0,
 			col = 2,
 		},
+	},
+	blame = {
+		inline_template = 'join(" ", commit.author().name(), "-", commit.author().timestamp().ago(), "\n")',
+		inline_separator = "   ",
+		enabled = false,
 	},
 	hooks = {},
 }
@@ -58,6 +69,18 @@ function M.configure(user_opts)
 
 	if user_opts.hooks then
 		config.hooks = vim.tbl_deep_extend("force", config.hooks, user_opts.hooks)
+	end
+
+	if user_opts.blame then
+		if user_opts.blame.inline_template then
+			config.blame.inline_template = user_opts.blame.inline_template
+		end
+		if user_opts.blame.inline_separator then
+			config.blame.inline_separator = user_opts.blame.inline_separator
+		end
+		if user_opts.blame.enabled ~= nil then
+			config.blame.enabled = user_opts.blame.enabled
+		end
 	end
 
 	M.config = config
