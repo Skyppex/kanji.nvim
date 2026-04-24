@@ -44,9 +44,9 @@ M.defaults = {
 	blame = {
 		inline_template = 'join(" ", commit.author().name(), "-", commit.author().timestamp().ago(), "\n")',
 		inline_separator = "   ",
-		buffer_template = 'join("##", commit.change_id().shortest(8), commit.author().timestamp().local().format("%v %R"), commit.author().name()) ++ "\n"',
+		buffer_template = 'join("##", commit.change_id().shortest(8), commit.author().name(), commit.author().timestamp().local().format("%v %R")) ++ "\n"',
 		buffer_winopts = {
-			width = 40,
+			width = 48,
 		},
 		enabled = false,
 	},

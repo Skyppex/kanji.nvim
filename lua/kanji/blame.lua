@@ -3,12 +3,14 @@ local M = {}
 local repo = require("kanji.repo")
 
 vim.api.nvim_command("highlight link KanjiInlineBlame WarningMsg")
-vim.api.nvim_command("highlight link KanjiBlameLine1 @variable")
-vim.api.nvim_command("highlight link KanjiBlameLine2 @constructor")
-vim.api.nvim_command("highlight link KanjiBlameLine3 @keyword")
-vim.api.nvim_command("highlight link KanjiBlameLine4 @constant")
-vim.api.nvim_command("highlight link KanjiBlameLine5 @namespace")
-vim.api.nvim_command("highlight link KanjiBlameLine6 @string")
+vim.api.nvim_command("highlight link KanjiBlameDescription @comment")
+
+vim.api.nvim_command("highlight link KanjiBlameLine1 @constructor")
+vim.api.nvim_command("highlight link KanjiBlameLine2 @namespace")
+vim.api.nvim_command("highlight link KanjiBlameLine3 @variable")
+vim.api.nvim_command("highlight link KanjiBlameLine4 @keyword")
+vim.api.nvim_command("highlight link KanjiBlameLine5 @string")
+vim.api.nvim_command("highlight link KanjiBlameLine6 @constant")
 vim.api.nvim_command("highlight link KanjiBlameLine7 @property")
 vim.api.nvim_command("highlight link KanjiBlameLine8 @comment")
 vim.api.nvim_command("highlight link KanjiBlameGuide1 @property")
@@ -195,7 +197,7 @@ function M.buffer_toggle()
 	local config = require("kanji.config").config
 	local template = config.blame.buffer_template
 
-	local line_template = 'join(" ", line_number, first_line_in_hunk, commit.description(), "\\n")'
+	local line_template = 'join("##", line_number, first_line_in_hunk, commit.description().first_line()) ++ "\\n"'
 
 	repo.get_blame(template, relative_path, function(blame_lines)
 		if not blame_lines then
@@ -218,7 +220,7 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 	local color_index = 1
 
 	for i, line in ipairs(line_info) do
-		local parts = vim.split(vim.trim(line), " ", { plain = true })
+		local parts = vim.split(vim.trim(line), "##", { plain = true })
 		local line_num = tonumber(parts[1])
 		local is_first = parts[2] == "true"
 
@@ -237,12 +239,16 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 	local current_change_id = nil
 
 	for i, line in ipairs(line_info) do
-		local parts = vim.split(vim.trim(line), " ", { plain = true })
+		local parts = vim.split(vim.trim(line), "##", { plain = true })
 		local line_num = tonumber(parts[1])
 		local is_first = parts[2] == "true"
+		local description = parts[3]
 
-		local next_parts = vim.split(vim.trim(line_info[i + 1] or ""), " ", { plain = true })
-		local next_is_first = next_parts[2] == "true"
+		local next_parts = vim.split(vim.trim(line_info[i + 1] or ""), "##", { plain = true })
+		local next_is_first = next_parts[2] == nil or next_parts[2] == "true"
+
+		local prev_parts = vim.split(vim.trim(line_info[i - 1] or ""), "##", { plain = true })
+		local prev_is_first = prev_parts[2] == "true"
 
 		local guide = "│"
 		if is_first and next_is_first then
@@ -282,9 +288,22 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 			end
 		else
 			content = guide
+
+			if prev_is_first then
+				content = content .. " " .. description
+			end
+
 			vim.api.nvim_buf_set_lines(blame_bufnr, i - 1, -1, false, { content })
+
 			if current_change_id then
 				guide_hl = "KanjiBlameGuide" .. tostring(change_id_map[current_change_id] or 1)
+			end
+
+			if prev_is_first then
+				vim.api.nvim_buf_set_extmark(blame_bufnr, state.buffer_ns, i - 1, 2, {
+					hl_group = "KanjiBlameDescription",
+					end_col = #description + 4, -- genuinely confused as to why this needs to be 4 but it works
+				})
 			end
 		end
 
