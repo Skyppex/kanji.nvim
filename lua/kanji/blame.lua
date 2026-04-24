@@ -27,6 +27,7 @@ local state = {
 	ns = nil,
 	buffer_ns = nil,
 	augroup = nil,
+	buffer_blame_augroup = nil,
 	buffer_cache = {},
 	guide_ns = nil,
 	active_bufnr = nil,
@@ -34,8 +35,10 @@ local state = {
 }
 
 local buffer_state = {
-	--- @type table<number, number>
-	blame_wins = {},
+	blame_win = nil,
+	blame_buf = nil,
+	source_win = nil,
+	source_path = nil,
 }
 
 function M.is_enabled()
@@ -179,19 +182,87 @@ end
 
 function M.buffer_toggle()
 	local source_bufnr = vim.api.nvim_get_current_buf()
-	local source_winid = vim.api.nvim_get_current_win()
 	local path = vim.api.nvim_buf_get_name(source_bufnr)
 
 	if not path or path == "" then
 		return
 	end
 
-	if buffer_state.blame_wins[source_winid] and vim.api.nvim_win_is_valid(buffer_state.blame_wins[source_winid]) then
-		vim.api.nvim_win_close(buffer_state.blame_wins[source_winid], true)
-		buffer_state.blame_wins[source_winid] = nil
+	if buffer_state.blame_win and vim.api.nvim_win_is_valid(buffer_state.blame_win) then
+		vim.api.nvim_win_close(buffer_state.blame_win, true)
+		buffer_state.blame_win = nil
+		buffer_state.blame_buf = nil
 		return
 	end
 
+	if not state.buffer_blame_augroup then
+		state.buffer_blame_augroup = vim.api.nvim_create_augroup("kanji-buffer-blame", { clear = true })
+
+		vim.api.nvim_create_autocmd("WinEnter", {
+			group = state.buffer_blame_augroup,
+			callback = function(args)
+				local buf_name = vim.api.nvim_buf_get_name(args.buf)
+				if buf_name:match("kanji%-blame$") then
+					return
+				end
+
+				local path = buf_name
+				if not path or path == "" then
+					return
+				end
+
+				if buffer_state.blame_win and vim.api.nvim_win_is_valid(buffer_state.blame_win) then
+					vim.api.nvim_win_close(buffer_state.blame_win, true)
+				end
+
+				buffer_state.blame_win = nil
+				buffer_state.blame_buf = nil
+				buffer_state.source_win = nil
+				buffer_state.source_path = nil
+
+				M.open_new_buffer_blame(path)
+			end,
+		})
+
+		vim.api.nvim_create_autocmd("BufEnter", {
+			group = state.buffer_blame_augroup,
+			callback = function(args)
+				local buf_name = vim.api.nvim_buf_get_name(args.buf)
+				if buf_name:match("kanji%-blame$") then
+					return
+				end
+
+				local path = buf_name
+				if not path or path == "" then
+					return
+				end
+
+				if buffer_state.source_path == path then
+					return
+				end
+
+				buffer_state.source_path = path
+
+				if buffer_state.blame_win and vim.api.nvim_win_is_valid(buffer_state.blame_win) then
+					M.update_buffer_blame(path)
+				end
+			end,
+		})
+	end
+
+	local source_bufnr = vim.api.nvim_get_current_buf()
+	local path = vim.api.nvim_buf_get_name(source_bufnr)
+	buffer_state.source_path = path
+	M.open_new_buffer_blame(path)
+end
+
+function M.open_new_buffer_blame(path)
+	if not path or path == "" then
+		return
+	end
+
+	buffer_state.source_path = path
+	local source_winid = vim.api.nvim_get_current_win()
 	state.buffer_ns = vim.api.nvim_create_namespace("kanji-blame-buffer")
 	local relative_path = vim.fn.fnamemodify(path, ":.")
 	local config = require("kanji.config").config
@@ -214,8 +285,49 @@ function M.buffer_toggle()
 	end)
 end
 
-function M.open_buffer_blame(source_winid, blame_lines, line_info)
-	local blame_bufnr = vim.api.nvim_create_buf(false, true)
+function M.update_buffer_blame(path)
+	local relative_path = vim.fn.fnamemodify(path, ":.")
+	local config = require("kanji.config").config
+	local template = config.blame.buffer_template
+
+	local line_template = 'join("##", line_number, first_line_in_hunk, commit.description().first_line()) ++ "\\n"'
+
+	repo.get_blame(template, relative_path, function(blame_lines)
+		if not blame_lines then
+			return
+		end
+		repo.get_blame(line_template, relative_path, function(line_info)
+			if not line_info then
+				return
+			end
+			vim.schedule(function()
+				M._update_buffer_blame_content(blame_lines, line_info)
+			end)
+		end)
+	end)
+end
+
+function M._update_buffer_blame_content(blame_lines, line_info)
+	if not buffer_state.blame_win or not vim.api.nvim_win_is_valid(buffer_state.blame_win) then
+		return
+	end
+
+	local blame_bufnr = vim.api.nvim_win_get_buf(buffer_state.blame_win)
+	if not blame_bufnr or not vim.api.nvim_buf_is_valid(blame_bufnr) then
+		return
+	end
+
+	M.write_blame_buffer_content(blame_bufnr, blame_lines, line_info)
+
+	vim.cmd.redraw()
+end
+
+function M.write_blame_buffer_content(blame_bufnr, blame_lines, line_info)
+	vim.api.nvim_set_option_value("modifiable", true, { buf = blame_bufnr })
+
+	state.buffer_ns = vim.api.nvim_create_namespace("kanji-blame-buffer")
+	state.guide_ns = vim.api.nvim_create_namespace("kanji-blame-guide")
+
 	local change_id_map = {}
 	local color_index = 1
 
@@ -234,7 +346,7 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 		end
 	end
 
-	state.guide_ns = vim.api.nvim_create_namespace("kanji-blame-guide")
+	vim.api.nvim_buf_set_lines(blame_bufnr, 0, -1, false, {})
 
 	local current_change_id = nil
 
@@ -302,7 +414,7 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 			if prev_is_first then
 				vim.api.nvim_buf_set_extmark(blame_bufnr, state.buffer_ns, i - 1, 2, {
 					hl_group = "KanjiBlameDescription",
-					end_col = #description + 4, -- genuinely confused as to why this needs to be 4 but it works
+					end_col = #description + 4,
 				})
 			end
 		end
@@ -312,6 +424,14 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 			hl_group = guide_hl,
 		})
 	end
+
+	vim.api.nvim_set_option_value("modifiable", false, { buf = blame_bufnr })
+end
+
+function M.open_buffer_blame(source_winid, blame_lines, line_info)
+	local blame_bufnr = vim.api.nvim_create_buf(false, true)
+
+	M.write_blame_buffer_content(blame_bufnr, blame_lines, line_info)
 
 	vim.api.nvim_set_option_value("readonly", true, { buf = blame_bufnr })
 	vim.api.nvim_set_option_value("modifiable", false, { buf = blame_bufnr })
@@ -332,32 +452,9 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 	vim.api.nvim_set_option_value("scrollbind", true, { win = blame_winid })
 	vim.api.nvim_set_option_value("scrollbind", true, { win = source_winid })
 
-	buffer_state.blame_wins[source_winid] = blame_winid
-
-	local augroup = vim.api.nvim_create_augroup("kanji_buffer_blame", { clear = true })
-
-	vim.api.nvim_create_autocmd("WinClosed", {
-		group = augroup,
-		pattern = tostring(blame_winid),
-		callback = function()
-			buffer_state.blame_wins[source_winid] = nil
-			vim.api.nvim_set_option_value("scrollbind", false, { win = source_winid })
-			vim.api.nvim_del_augroup_by_id(augroup)
-		end,
-	})
-
-	vim.api.nvim_create_autocmd("WinClosed", {
-		group = augroup,
-		pattern = tostring(source_winid),
-		callback = function()
-			local blame_win = buffer_state.blame_wins[source_winid]
-			if blame_win and vim.api.nvim_win_is_valid(blame_win) then
-				vim.api.nvim_win_close(blame_win, true)
-			end
-			buffer_state.blame_wins[source_winid] = nil
-			vim.api.nvim_del_augroup_by_id(augroup)
-		end,
-	})
+	buffer_state.blame_win = blame_winid
+	buffer_state.blame_buf = blame_bufnr
+	buffer_state.source_win = source_winid
 
 	vim.cmd.redraw()
 	vim.cmd.syncbind()
