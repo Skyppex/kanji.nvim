@@ -22,6 +22,8 @@ local M = {}
 --- @class KanjiBlameOpts
 --- @field inline_template string
 --- @field inline_separator string
+--- @field buffer_template string
+--- @field buffer_winopts table<string, any>
 --- @field enabled boolean
 
 --- @type KanjiOpts
@@ -42,6 +44,10 @@ M.defaults = {
 	blame = {
 		inline_template = 'join(" ", commit.author().name(), "-", commit.author().timestamp().ago(), "\n")',
 		inline_separator = "   ",
+		buffer_template = 'join("##", commit.change_id().shortest(8), commit.author().timestamp().local().format("%v %R"), commit.author().name()) ++ "\n"',
+		buffer_winopts = {
+			width = 40,
+		},
 		enabled = false,
 	},
 	hooks = {},
@@ -77,6 +83,13 @@ function M.configure(user_opts)
 		end
 		if user_opts.blame.inline_separator then
 			config.blame.inline_separator = user_opts.blame.inline_separator
+		end
+		if user_opts.blame.buffer_template then
+			config.blame.buffer_template = user_opts.blame.buffer_template
+		end
+		if user_opts.blame.buffer_winopts then
+			config.blame.buffer_winopts =
+				vim.tbl_deep_extend("force", config.blame.buffer_winopts, user_opts.blame.buffer_winopts)
 		end
 		if user_opts.blame.enabled ~= nil then
 			config.blame.enabled = user_opts.blame.enabled

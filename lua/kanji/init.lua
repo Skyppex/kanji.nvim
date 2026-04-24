@@ -153,8 +153,11 @@ function M.close_preview()
 end
 
 function M.blame_toggle()
-	vim.notify("1")
 	blame.toggle()
+end
+
+function M.buffer_blame_toggle()
+	blame.buffer_toggle()
 end
 
 return M

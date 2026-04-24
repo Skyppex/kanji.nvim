@@ -31,11 +31,11 @@ Customize sign text:
 
 ```lua
 require("kanji").setup({
-  signs = {
-    add = { text = "+" },
-    change = { text = "~" },
-    delete = { text = "-" },
-  },
+	signs = {
+		add = { text = "+" },
+		change = { text = "~" },
+		delete = { text = "-" },
+	},
 })
 ```
 
@@ -59,3 +59,5 @@ Signs use Neovim's built-in highlight groups:
     - [ ] display diff with external diff viewer
 - [ ] blame annotations in a separate buffer
 - [ ] inline blame
+
+╺ ┍ │ ┕
