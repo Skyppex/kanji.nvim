@@ -24,6 +24,7 @@ local M = {}
 --- @field inline_separator string
 --- @field buffer_template string
 --- @field buffer_winopts table<string, any>
+--- @field buffer_behavior "transient"|"follow"
 --- @field enabled boolean
 
 --- @type KanjiOpts
@@ -48,6 +49,7 @@ M.defaults = {
 		buffer_winopts = {
 			width = 48,
 		},
+		buffer_behavior = "follow",
 		enabled = false,
 	},
 	hooks = {},
@@ -90,6 +92,9 @@ function M.configure(user_opts)
 		if user_opts.blame.buffer_winopts then
 			config.blame.buffer_winopts =
 				vim.tbl_deep_extend("force", config.blame.buffer_winopts, user_opts.blame.buffer_winopts)
+		end
+		if user_opts.blame.buffer_behavior then
+			config.blame.buffer_behavior = user_opts.blame.buffer_behavior
 		end
 		if user_opts.blame.enabled ~= nil then
 			config.blame.enabled = user_opts.blame.enabled
