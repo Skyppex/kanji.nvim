@@ -14,7 +14,7 @@ Using your plugin manager:
 
 ```lua
 -- lazy.nvim
-{ "your username/kanji.nvim" }
+{ "skyppex/kanji.nvim" }
 ```
 
 ## Usage
@@ -30,16 +30,15 @@ Signs will automatically appear in the signcolumn for files in a jj repository.
 Customize sign text:
 
 ```lua
+-- these are the defaults
 require("kanji").setup({
 	signs = {
-		add = { text = "+" },
-		change = { text = "~" },
-		delete = { text = "-" },
+		add = { text = "A" },
+		change = { text = "M" },
+		delete = { text = "D" },
 	},
 })
 ```
-
-Default sign text: `A` (add), `M` (change), `D` (delete)
 
 ## Signs
 
@@ -59,5 +58,3 @@ Signs use Neovim's built-in highlight groups:
     - [ ] display diff with external diff viewer
 - [ ] blame annotations in a separate buffer
 - [ ] inline blame
-
-╺ ┍ │ ┕
