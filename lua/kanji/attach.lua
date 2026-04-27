@@ -1,7 +1,6 @@
 local M = {}
 
 local repo = require("kanji.repo")
-local diff = require("kanji.diff")
 local signs = require("kanji.signs")
 
 M.attached_buffers = {}
@@ -15,7 +14,7 @@ function M.refresh(bufnr)
 
 	local relative_path = vim.fn.fnamemodify(path, ":.")
 	repo.get_diff(relative_path, function(diff_output)
-		local sign_list = diff.get_signs(diff_output)
+		local sign_list = signs.get_signs(diff_output)
 		vim.schedule(function()
 			signs.clear(bufnr)
 			if #sign_list > 0 then

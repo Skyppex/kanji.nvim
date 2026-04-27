@@ -250,17 +250,9 @@ function M.buffer_toggle()
 		vim.api.nvim_create_autocmd("WinClosed", {
 			group = state.buffer.augroup,
 			callback = function(args)
-				vim.notify("1")
 				if not state.buffer.enabled then
-					vim.notify("2")
 					return
 				end
-
-				vim.notify("3")
-				vim.notify(vim.inspect({
-					vim.api.nvim_get_current_win(),
-					args.match,
-				}))
 
 				if tonumber(args.match) == state.buffer.blame_win then
 					state.buffer.blame_win = nil
@@ -272,25 +264,19 @@ function M.buffer_toggle()
 				end
 
 				if tonumber(args.match) ~= state.buffer.source_win then
-					vim.notify("4")
 					return
 				end
 
-				vim.notify("5")
 				if state.buffer.blame_win and vim.api.nvim_win_is_valid(state.buffer.blame_win) then
-					vim.notify("6")
 					vim.api.nvim_win_close(state.buffer.blame_win, true)
 				end
 
-				vim.notify("7")
 				state.buffer.blame_win = nil
 				state.buffer.blame_buf = nil
 				state.buffer.source_win = nil
 				state.buffer.source_path = nil
 
-				vim.notify("8")
 				if state.buffer.behavior == "transient" then
-					vim.notify("9")
 					state.buffer.enabled = false
 				end
 			end,

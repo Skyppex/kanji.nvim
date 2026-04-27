@@ -19,11 +19,28 @@ local function calc_group_type(group)
 	return "delete"
 end
 
+--- @class KanjiHunk
+--- @field old_start number
+--- @field new_start number
+--- @field groups KanjiGroup[]
+--- @field current_group KanjiGroup
+---
+--- @class KanjiGroup
+--- @field lines KanjiLine[]
+--- @field type "add"|"change"|"delete"
+---
+--- @class KanjiLine
+--- @field line number
+--- @field text string
+--- @field type "add"|"change"|"delete"
+---
+--- @return KanjiHunk[]
 function M.parse(diff_output)
 	if not diff_output or #diff_output == 0 then
 		return {}
 	end
 
+	--- @type KanjiHunk[]
 	local hunks = {}
 	local line_in_file = 1
 
@@ -31,6 +48,7 @@ function M.parse(diff_output)
 		local old_start, new_start = line:match("^@@ %-(%d+),?%d* %+(%d+),?%d* @@$")
 		if old_start then
 			table.insert(hunks, {
+				old_start = tonumber(old_start),
 				new_start = tonumber(new_start),
 				groups = {},
 				current_group = {},
@@ -38,6 +56,7 @@ function M.parse(diff_output)
 			line_in_file = tonumber(new_start, 10)
 		elseif hunks[#hunks] then
 			local first = line:sub(1, 1)
+
 			local hunk = hunks[#hunks]
 
 			if first == "+" then
@@ -98,23 +117,4 @@ function M.parse(diff_output)
 	return hunks
 end
 
-function M.get_signs(diff_output)
-	local hunks = M.parse(diff_output)
-	local signs = {}
-
-	for _, hunk in ipairs(hunks) do
-		for _, group in ipairs(hunk.groups) do
-			for _, l in ipairs(group.lines) do
-				table.insert(signs, {
-					line = l.line,
-					type = group.type,
-				})
-			end
-		end
-	end
-
-	return signs
-end
-
 return M
-

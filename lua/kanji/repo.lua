@@ -18,7 +18,42 @@ function M.get_diff(path, on_done)
 
 	Job:new({
 		command = "jj",
-		args = { "diff", "--git", "--", path },
+		args = {
+			"diff",
+			"--from",
+			"@-",
+			"--to",
+			"@",
+			"--git",
+			"--",
+			path,
+		},
+		on_exit = function(j, exit_code, _)
+			if exit_code ~= 0 then
+				return
+			end
+			on_done(j:result())
+		end,
+	}):start()
+end
+
+function M.get_inverse_diff(path, on_done)
+	if not path then
+		return
+	end
+
+	Job:new({
+		command = "jj",
+		args = {
+			"diff",
+			"--from",
+			"@",
+			"--to",
+			"@-",
+			"--git",
+			"--",
+			path,
+		},
 		on_exit = function(j, exit_code, _)
 			if exit_code ~= 0 then
 				return

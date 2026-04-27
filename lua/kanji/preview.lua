@@ -1,3 +1,5 @@
+local utils = require("kanji.utils")
+
 local M = {}
 
 local state = {
@@ -22,21 +24,6 @@ function M.close()
 		vim.api.nvim_del_augroup_by_id(state.augroup)
 		state.augroup = nil
 	end
-end
-
-local function find_group_at_line(hunks, cursor_line)
-	for _, hunk in ipairs(hunks) do
-		for _, group in ipairs(hunk.groups) do
-			local first_line = group.lines[1] and group.lines[1].line
-			local last_line = group.lines[#group.lines] and group.lines[#group.lines].line
-			if first_line and last_line then
-				if cursor_line >= first_line and cursor_line <= last_line then
-					return group
-				end
-			end
-		end
-	end
-	return nil
 end
 
 local function format_group_content(group)
@@ -150,7 +137,7 @@ function M.toggle()
 				return
 			end
 
-			local group = find_group_at_line(hunks, cursor)
+			local group = utils.find_group_at_line(hunks, cursor)
 			if not group then
 				M.close()
 				return

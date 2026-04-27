@@ -1,9 +1,15 @@
 local M = {}
 
+local diff = require("kanji.diff")
+
+vim.api.nvim_command("highlight link KanjiDiffAdd DiffAdd")
+vim.api.nvim_command("highlight link KanjiDiffChange DiffChange")
+vim.api.nvim_command("highlight link KanjiDiffDelete DiffDelete")
+
 local HL_MAP = {
-	add = "DiffAdd",
-	change = "DiffChange",
-	delete = "DiffDelete",
+	add = "KanjiDiffAdd",
+	change = "KanjiDiffChange",
+	delete = "KanjiDiffDelete",
 }
 
 function M.setup()
@@ -18,6 +24,24 @@ function M.setup()
 			texthl = hl,
 		})
 	end
+end
+
+function M.get_signs(diff_output)
+	local hunks = diff.parse(diff_output)
+	local signs = {}
+
+	for _, hunk in ipairs(hunks) do
+		for _, group in ipairs(hunk.groups) do
+			for _, l in ipairs(group.lines) do
+				table.insert(signs, {
+					line = l.line,
+					type = group.type,
+				})
+			end
+		end
+	end
+
+	return signs
 end
 
 function M.place(bufnr, signs)
