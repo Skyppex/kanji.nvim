@@ -4,7 +4,8 @@
 --- @field prev_hunk fun()
 --- @field preview_hunk fun()
 --- @field close_preview fun()
---- @field reset_hunk fun()
+--- @field restore_hunk fun()
+--- @field restore_file fun()
 --- @field blame_toggle fun()
 --- @field blame_buffer_toggle fun()
 
@@ -15,6 +16,8 @@ local attach = require("kanji.attach")
 local preview = require("kanji.preview")
 local blame = require("kanji.blame")
 local utils = require("kanji.utils")
+local repo = require("kanji.repo")
+local signs = require("kanji.signs")
 
 --- @param opts KanjiOpts
 function M.setup(opts)
@@ -39,8 +42,6 @@ function M.next_hunk()
 	end
 
 	local relative_path = vim.fn.fnamemodify(path, ":.")
-	local repo = require("kanji.repo")
-	local signs = require("kanji.signs")
 
 	repo.get_diff(relative_path, function(diff_output)
 		local sign_data = signs.get_signs(diff_output)
@@ -103,8 +104,6 @@ function M.prev_hunk()
 	end
 
 	local relative_path = vim.fn.fnamemodify(path, ":.")
-	local repo = require("kanji.repo")
-	local signs = require("kanji.signs")
 
 	repo.get_diff(relative_path, function(diff_output)
 		local sign_data = signs.get_signs(diff_output)
@@ -164,7 +163,7 @@ function M.close_preview()
 	preview.close()
 end
 
-function M.reset_hunk()
+function M.restore_hunk()
 	local bufnr = vim.api.nvim_get_current_buf()
 	local path = vim.api.nvim_buf_get_name(bufnr)
 
@@ -238,6 +237,20 @@ function M.reset_hunk()
 
 			vim.cmd("noautocmd write!")
 			attach.refresh(current_bufnr)
+		end)
+	end)
+end
+
+function M.restore_file()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local path = vim.api.nvim_buf_get_name(bufnr)
+	repo.restore_file(path, function(job)
+		if not job then
+			return
+		end
+
+		vim.schedule(function()
+			vim.cmd("checktime")
 		end)
 	end)
 end
