@@ -26,7 +26,7 @@ function M.setup(opts)
 
 	local config = require("kanji.config").config
 	if config.blame and config.blame.enabled then
-		blame.enable()
+		blame.enable_inline_blame()
 	end
 end
 
@@ -256,7 +256,7 @@ function M.restore_file()
 end
 
 function M.blame_toggle()
-	blame.toggle()
+	blame.toggle_inline_blame()
 end
 
 function M.blame_buffer_toggle()
