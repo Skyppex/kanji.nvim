@@ -44,6 +44,14 @@ M.state = {
 	},
 }
 
+function M.is_blame_buffer(bufnr)
+	return bufnr and M.state.buffer.blame_buf and bufnr == M.state.buffer.blame_buf
+end
+
+function M.get_source_path()
+	return M.state.buffer.source_path
+end
+
 local function disable_scrollbind()
 	if M.state.buffer.blame_win and vim.api.nvim_win_is_valid(M.state.buffer.blame_win) then
 		vim.api.nvim_set_option_value("scrollbind", false, { win = M.state.buffer.blame_win })
@@ -54,6 +62,7 @@ local function disable_scrollbind()
 end
 
 local function enable_scrollbind()
+	vim.notify("enabling scrollbind")
 	if M.state.buffer.blame_win and vim.api.nvim_win_is_valid(M.state.buffer.blame_win) then
 		vim.api.nvim_set_option_value("scrollbind", true, { win = M.state.buffer.blame_win })
 	end
@@ -96,6 +105,10 @@ local function enable_blame_buffer()
 				return
 			end
 
+			if require("kanji.inspect").is_inspect_win(current_win) then
+				return
+			end
+
 			if M.state.buffer.blame_win and vim.api.nvim_win_is_valid(M.state.buffer.blame_win) then
 				disable_scrollbind()
 				vim.api.nvim_win_close(M.state.buffer.blame_win, true)
@@ -107,8 +120,10 @@ local function enable_blame_buffer()
 			M.state.buffer.source_path = nil
 
 			if require("kanji.config").config.blame.buffer_behavior == "transient" then
-				M.state.buffer.enabled = false
+				disable_blame_buffer()
+				return
 			end
+
 			local buf_name = vim.api.nvim_buf_get_name(args.buf)
 
 			if buf_name:match("kanji%-blame$") then
@@ -169,12 +184,12 @@ local function enable_blame_buffer()
 				return
 			end
 
-			local buf_name = vim.api.nvim_buf_get_name(args.buf)
-			if buf_name:match("kanji%-blame$") then
+			if M.is_blame_buffer(args.buf) then
 				return
 			end
 
-			local path = buf_name
+			local path = vim.api.nvim_buf_get_name(args.buf)
+
 			if not path or path == "" then
 				return
 			end

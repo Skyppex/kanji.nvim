@@ -8,6 +8,8 @@
 --- @field restore_file fun()
 --- @field blame_toggle fun()
 --- @field blame_buffer_toggle fun()
+--- @field show_revset_info fun()
+--- @field close_revset_info fun()
 
 --- @type KanjiApi
 local M = {}
@@ -15,6 +17,7 @@ local M = {}
 local attach = require("kanji.attach")
 local preview = require("kanji.preview")
 local blame = require("kanji.blame")
+local inspect = require("kanji.inspect")
 local utils = require("kanji.utils")
 local repo = require("kanji.repo")
 local signs = require("kanji.signs")
@@ -261,6 +264,14 @@ end
 
 function M.blame_buffer_toggle()
 	blame.buffer_toggle()
+end
+
+function M.show_revset_info()
+	inspect.show()
+end
+
+function M.close_revset_info()
+	inspect.close()
 end
 
 return M

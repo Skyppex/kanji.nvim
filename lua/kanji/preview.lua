@@ -76,7 +76,7 @@ local function open(lines, focus)
 	state.winid = vim.api.nvim_open_win(buf, focus, winopts)
 
 	if config.hooks and config.hooks.on_preview_show then
-		config.hooks.on_preview_show(buf)
+		config.hooks.on_preview_show(buf, state.winid)
 	end
 
 	local group = vim.api.nvim_create_augroup("kanji_preview", { clear = true })
@@ -126,7 +126,7 @@ function M.toggle()
 		else
 			vim.api.nvim_set_current_win(state.winid)
 			if config.hooks and config.hooks.on_preview_focus then
-				config.hooks.on_preview_focus(state.bufnr)
+				config.hooks.on_preview_focus(state.bufnr, state.winid)
 			end
 		end
 	else

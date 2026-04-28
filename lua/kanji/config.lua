@@ -5,6 +5,7 @@ local M = {}
 --- @field preview KanjiPreviewOpts
 --- @field hooks KanjiHooksOpts
 --- @field blame KanjiBlameOpts
+--- @field inspect KanjiInspectOpts
 
 --- @class KanjiSignsOpts
 --- @field add KanjiSignOpts
@@ -16,8 +17,13 @@ local M = {}
 --- @field winopts table<string, any>
 
 --- @class KanjiHooksOpts
---- @field on_preview_show fun(bufnr: number)?
---- @field on_preview_focus fun(bufnr: number)?
+--- @field on_preview_show fun(bufnr: number, winid: number)?
+--- @field on_preview_focus fun(bufnr: number, winid: number)?
+--- @field on_inspect_show fun(bufnr: number, winid: number)?
+--- @field on_inspect_focus fun(bufnr: number, winid: number)?
+
+--- @class KanjiInspectOpts
+--- @field winopts table<string, any>
 
 --- @class KanjiBlameOpts
 --- @field inline_template string
@@ -53,6 +59,14 @@ M.defaults = {
 		enabled = false,
 	},
 	hooks = {},
+	inspect = {
+		winopts = {
+			border = "rounded",
+			relative = "cursor",
+			row = 0,
+			col = 2,
+		},
+	},
 }
 
 --- @type KanjiOpts
@@ -99,6 +113,10 @@ function M.configure(user_opts)
 		if user_opts.blame.enabled ~= nil then
 			config.blame.enabled = user_opts.blame.enabled
 		end
+	end
+
+	if user_opts.inspect and user_opts.inspect.winopts then
+		config.inspect.winopts = vim.tbl_deep_extend("force", config.inspect.winopts, user_opts.inspect.winopts)
 	end
 
 	M.config = config

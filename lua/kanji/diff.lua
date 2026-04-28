@@ -117,4 +117,20 @@ function M.parse(diff_output)
 	return hunks
 end
 
+--- @param group KanjiGroup
+--- @return string[]
+function M.format_group_content(group)
+	local lines = {}
+	for _, l in ipairs(group.lines) do
+		local prefix = ""
+		if l.type == "add" then
+			prefix = "+"
+		elseif l.type == "delete" then
+			prefix = "-"
+		end
+		table.insert(lines, prefix .. l.text)
+	end
+	return lines
+end
+
 return M
