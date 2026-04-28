@@ -49,7 +49,7 @@ M.defaults = {
 		buffer_winopts = {
 			width = 48,
 		},
-		buffer_behavior = "follow",
+		buffer_behavior = "transient",
 		enabled = false,
 	},
 	hooks = {},

@@ -441,7 +441,7 @@ function M.write_blame_buffer_content(blame_bufnr, blame_lines, line_info)
 			current_change_id = content_parts[1]
 			content = guide .. " " .. table.concat(content_parts, " ")
 			vim.api.nvim_buf_set_lines(blame_bufnr, i - 1, -1, false, { content })
-			guide_hl = "KanjiBlameGuide" .. tostring(change_id_map[current_change_id] or 1)
+			guide_hl = "KanjiBlameGuide" .. tostring(change_id_map[current_change_id] % 8 or 1)
 
 			local current_col = #guide + 1
 
@@ -470,7 +470,7 @@ function M.write_blame_buffer_content(blame_bufnr, blame_lines, line_info)
 			vim.api.nvim_buf_set_lines(blame_bufnr, i - 1, -1, false, { content })
 
 			if current_change_id then
-				guide_hl = "KanjiBlameGuide" .. tostring(change_id_map[current_change_id] or 1)
+				guide_hl = "KanjiBlameGuide" .. tostring(change_id_map[current_change_id] % 8 or 1)
 			end
 
 			if prev_is_first then
