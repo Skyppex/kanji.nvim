@@ -21,6 +21,7 @@ local M = {}
 --- @field on_preview_focus fun(bufnr: number, winid: number)?
 --- @field on_inspect_show fun(bufnr: number, winid: number)?
 --- @field on_inspect_focus fun(bufnr: number, winid: number)?
+--- @field on_blame_buffer_open fun(bufnr: number, winid: number)?
 
 --- @class KanjiInspectOpts
 --- @field winopts table<string, any>

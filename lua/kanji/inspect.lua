@@ -121,6 +121,7 @@ local function open(lines)
 
 	state.winid = vim.api.nvim_open_win(buf, false, winopts)
 
+	vim.api.nvim_set_option_value("scrollbind", false, { win = state.winid })
 	vim.api.nvim_set_option_value("filetype", "markdown", { buf = buf })
 	vim.api.nvim_set_option_value("readonly", true, { buf = buf })
 	vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
