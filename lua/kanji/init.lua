@@ -21,6 +21,7 @@ local inspect = require("kanji.inspect")
 local utils = require("kanji.utils")
 local repo = require("kanji.repo")
 local signs = require("kanji.signs")
+local conflicts = require("kanji.conflicts")
 
 --- @param opts KanjiOpts
 function M.setup(opts)
@@ -272,6 +273,14 @@ end
 
 function M.close_revset_info()
 	inspect.close()
+end
+
+function M.conflicts()
+	conflicts.conflicts()
+end
+
+function M.conflicts_to_qf()
+	conflicts.conflicts_to_qf()
 end
 
 return M

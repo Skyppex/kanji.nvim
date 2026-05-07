@@ -30,9 +30,14 @@ function M.get_diff(path, on_done)
 		},
 		on_exit = function(j, exit_code, _)
 			if exit_code ~= 0 then
+				if on_done then
+					on_done(nil)
+				end
 				return
 			end
-			on_done(j:result())
+			if on_done then
+				on_done(j:result())
+			end
 		end,
 	}):start()
 end
@@ -56,9 +61,15 @@ function M.get_inverse_diff(path, on_done)
 		},
 		on_exit = function(j, exit_code, _)
 			if exit_code ~= 0 then
+				if on_done then
+					on_done(nil)
+				end
 				return
 			end
-			on_done(j:result())
+
+			if on_done then
+				on_done(j:result())
+			end
 		end,
 	}):start()
 end
@@ -79,10 +90,15 @@ function M.get_blame(template, path, on_done)
 		},
 		on_exit = function(j, exit_code, _)
 			if exit_code ~= 0 then
-				on_done(nil)
+				if on_done then
+					on_done(nil)
+				end
 				return
 			end
-			on_done(j:result())
+
+			if on_done then
+				on_done(j:result())
+			end
 		end,
 	}):start()
 end
@@ -100,10 +116,15 @@ function M.restore_file(path, on_done)
 		},
 		on_exit = function(j, exit_code, _)
 			if exit_code ~= 0 then
-				on_done(nil)
+				if on_done then
+					on_done(nil)
+				end
 				return
 			end
-			on_done(j:result())
+
+			if on_done then
+				on_done(j:result())
+			end
 		end,
 	}):start()
 end
@@ -129,10 +150,15 @@ function M.get_revset_info(change_id, on_done)
 		},
 		on_exit = function(j, exit_code, _)
 			if exit_code ~= 0 then
-				on_done(nil)
+				if on_done then
+					on_done(nil)
+				end
 				return
 			end
-			on_done(j:result())
+
+			if on_done then
+				on_done(j:result())
+			end
 		end,
 	}):start()
 end
@@ -156,10 +182,38 @@ function M.get_commit_diff(change_id, path, on_done)
 		},
 		on_exit = function(j, exit_code, _)
 			if exit_code ~= 0 then
-				on_done(nil)
+				if on_done then
+					on_done(nil)
+				end
 				return
 			end
-			on_done(j:result())
+
+			if on_done then
+				on_done(j:result())
+			end
+		end,
+	}):start()
+end
+
+function M.resolve_list(on_done)
+	Job:new({
+		command = "jj",
+		args = {
+			"resolve",
+			"--list",
+		},
+		on_exit = function(j, exit_code, _)
+			if exit_code ~= 0 then
+				if on_done then
+					on_done(nil)
+				end
+
+				return
+			end
+
+			if on_done then
+				on_done(j:result())
+			end
 		end,
 	}):start()
 end
