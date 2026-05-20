@@ -64,6 +64,25 @@ local function open(lines, focus)
 		focusable = true,
 	}, config.preview.winopts)
 
+	if winopts.relative == "cursor" then
+		local show_below = true
+		local editor_win_height = vim.api.nvim_win_get_height(0)
+		local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+		local cursor_is_below_half = cursor_line > math.floor(editor_win_height / 2)
+
+		if cursor_is_below_half then
+			local win_pos = vim.api.nvim_win_get_position(0)
+			local cursor_winline = vim.fn.winline()
+			local cursor_screen_row = win_pos[1] + cursor_winline - 1
+
+			if cursor_screen_row + height >= vim.o.lines then
+				show_below = false
+			end
+		end
+
+		winopts.row = show_below and 1 or -height
+	end
+
 	local buf = vim.api.nvim_create_buf(false, true)
 	state.bufnr = buf
 
