@@ -567,7 +567,11 @@ function M.open_buffer_blame(source_winid, blame_lines, line_info)
 	enable_scrollbind()
 
 	vim.cmd.redraw()
-	require("kanji.config").config.hooks.on_blame_buffer_open(blame_bufnr, blame_winid)
+	local hooks = require("kanji.config").config.hooks
+
+	if hooks.on_blame_buffer_open then
+		hooks.on_blame_buffer_open(blame_bufnr, blame_winid)
+	end
 end
 
 return M
