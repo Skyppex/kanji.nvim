@@ -280,6 +280,10 @@ function M.disable_inline_blame()
 end
 
 function M.blame_buffer(bufnr)
+	if not M.state.inline.enabled then
+		return
+	end
+
 	local path = vim.api.nvim_buf_get_name(bufnr)
 	if not path or path == "" then
 		return
