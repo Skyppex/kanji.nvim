@@ -1,0 +1,548 @@
+import { concat }                                                                             from 'lodash';
+import { createRouter, createWebHistory, NavigationFailure, RouteLocationNormalized, Router } from 'vue-router';
+
+<<<<<<< conflict 1 of 1
++++++++ moxtytrz 4994c163 "Load Quasar's stylesheet in browser-test mode (#22485)" (rebase destination)
+import Authentication                                    from '$application/authentication';
+import DefHentInterface                                  from '$application/definitions/def-hent-interface';
+import type DefRouterBootstrapper                        from '$application/definitions/def-router-bootstrap';
+import RouterGuards                                      from '$application/router-guards';
+import store                                             from '$application/store';
+import VersionChecker                                    from '$application/version-checker';
+import routesProcessDeviations                           from '$modules/routes/routes-process-deviations';
+import Breadcrumbs                                       from '$plugins/breadcrumbs';
+import routes2d3d                                        from '$routes/routes-2d-3d';
+import routesActions                                     from '$routes/routes-actions';
+import routesADGroups                                    from '$routes/routes-ad-groups';
+import routesApp                                         from '$routes/routes-app';
+import routesArticles                                    from '$routes/routes-articles';
+import routesBcf                                         from '$routes/routes-bcf';
+import routesChecklists                                  from '$routes/routes-checklists';
+import routesCommon                                      from '$routes/routes-common';
+import routesCompanies                                   from '$routes/routes-companies';
+import routesContracts                                   from '$routes/routes-contracts';
+import routesControlPlans                                from '$routes/routes-control-plans';
+import routesControls                                    from '$routes/routes-controls';
+import routesControlsLegacy                              from '$routes/routes-controls-legacy';
+import routesCurriculaVitae                              from '$routes/routes-curricula-vitae';
+import routesDecisions                                   from '$routes/routes-decisions';
+import routesDocuments                                   from '$routes/routes-documents';
+import routesDoors                                       from '$routes/routes-doors';
+import routesFlow                                        from '$routes/routes-flow';
+import routesGuarantees                                  from '$routes/routes-guarantees';
+import routesImprovementSuggestions                      from '$routes/routes-improvement-suggestions';
+import routesJournal                                     from '$routes/routes-journal';
+import routesKonradContent                               from '$routes/routes-konrad-content';
+import routesLanguages                                   from '$routes/routes-languages';
+import routesMeasurement                                 from '$routes/routes-measurement';
+import routesMeetings, { redirectMeetingChildToMeeting } from '$routes/routes-meetings';
+import routesUpdates                                     from '$routes/routes-messages';
+import routesNonconformities                             from '$routes/routes-nonconformities';
+import routesPerformanceReviews                          from '$routes/routes-performance-reviews';
+import routesPlazas                                      from '$routes/routes-plazas';
+import routesPresentations                               from '$routes/routes-presentations';
+import routesProcesses                                   from '$routes/routes-processes';
+import routesProjectManagement                           from '$routes/routes-project-management';
+import routesProjects                                    from '$routes/routes-projects';
+import routesRemarks                                     from '$routes/routes-remarks';
+import routesReports                                     from '$routes/routes-reports';
+import routesRequirements                                from '$routes/routes-requirements';
+import routesRights                                      from '$routes/routes-rights';
+import routesStandards                                   from '$routes/routes-standards';
+import routesSubcontracts                                from '$routes/routes-subcontracts';
+import routesSuppliers                                   from '$routes/routes-suppliers';
+import routesSystems                                     from '$routes/routes-systems';
+import routesTenders                                     from '$routes/routes-tenders';
+import routesTests                                       from '$routes/routes-tests';
+import routesUsers                                       from '$routes/routes-users';
+import DefEventBus                                       from '$services/event-bus/definitions/def-event-bus';
+import EventBus                                          from '$services/event-bus/plugin';
+import FlowManager                                       from '$services/flow/flow-manager';
+import Hashes                                            from '$services/hashes';
+import { setSentryProjectTag }                           from '$services/observability/sentry-user';
+import { resolveFlowTeardownProjectId }                  from '$services/router/flow-teardown';
+import Seneschal                                         from '$services/seneschal/plugin';
+import TabClerk                                          from '$services/tabs/tab-clerk';
+%%%%%%% diff from: rsppvkxm c5bffe60 "[Deviations] Save responsible for closing on complaint deviations (#22167)" (parents of rebased revision)
+\\\\\\\        to: sqmoyzlz 24a41076 (rebased revision)
+ import Authentication               from '$application/authentication';
+ import DefHentInterface             from '$application/definitions/def-hent-interface';
+ import type DefRouterBootstrapper   from '$application/definitions/def-router-bootstrap';
+ import RouterGuards                 from '$application/router-guards';
+ import store                        from '$application/store';
+ import VersionChecker               from '$application/version-checker';
+ import routesProcessDeviations      from '$modules/routes/routes-process-deviations';
+ import Breadcrumbs                  from '$plugins/breadcrumbs';
+ import routes2d3d                   from '$routes/routes-2d-3d';
++import routes2d3dSindri             from '$routes/routes-2d3d-sindri';
+ import routesActions                from '$routes/routes-actions';
+ import routesADGroups               from '$routes/routes-ad-groups';
+ import routesApp                    from '$routes/routes-app';
+ import routesArticles               from '$routes/routes-articles';
+ import routesBcf                    from '$routes/routes-bcf';
+ import routesChecklists             from '$routes/routes-checklists';
+ import routesCommon                 from '$routes/routes-common';
+ import routesCompanies              from '$routes/routes-companies';
+ import routesContracts              from '$routes/routes-contracts';
+ import routesControlPlans           from '$routes/routes-control-plans';
+ import routesControls               from '$routes/routes-controls';
+ import routesControlsLegacy         from '$routes/routes-controls-legacy';
+ import routesCurriculaVitae         from '$routes/routes-curricula-vitae';
+ import routesDecisions              from '$routes/routes-decisions';
+ import routesDocuments              from '$routes/routes-documents';
+ import routesDoors                  from '$routes/routes-doors';
+ import routesFlow                   from '$routes/routes-flow';
+ import routesGuarantees             from '$routes/routes-guarantees';
+ import routesImprovementSuggestions from '$routes/routes-improvement-suggestions';
+ import routesJournal                from '$routes/routes-journal';
+ import routesKonradContent          from '$routes/routes-konrad-content';
+ import routesLanguages              from '$routes/routes-languages';
+ import routesMeasurement            from '$routes/routes-measurement';
+ import routesMeetings               from '$routes/routes-meetings';
+ import routesUpdates                from '$routes/routes-messages';
+ import routesNonconformities        from '$routes/routes-nonconformities';
+ import routesPerformanceReviews     from '$routes/routes-performance-reviews';
+ import routesPlazas                 from '$routes/routes-plazas';
+ import routesPresentations          from '$routes/routes-presentations';
+ import routesProcesses              from '$routes/routes-processes';
+ import routesProjectManagement      from '$routes/routes-project-management';
+ import routesProjects               from '$routes/routes-projects';
+ import routesRemarks                from '$routes/routes-remarks';
+ import routesReports                from '$routes/routes-reports';
+ import routesRequirements           from '$routes/routes-requirements';
+ import routesRights                 from '$routes/routes-rights';
+ import routesStandards              from '$routes/routes-standards';
+ import routesSubcontracts           from '$routes/routes-subcontracts';
+ import routesSuppliers              from '$routes/routes-suppliers';
+ import routesSystems                from '$routes/routes-systems';
+ import routesTenders                from '$routes/routes-tenders';
+ import routesTests                  from '$routes/routes-tests';
+ import routesUsers                  from '$routes/routes-users';
+ import DefEventBus                  from '$services/event-bus/definitions/def-event-bus';
+ import EventBus                     from '$services/event-bus/plugin';
+ import FlowManager                  from '$services/flow/flow-manager';
+ import Hashes                       from '$services/hashes';
+ import { setSentryProjectTag }      from '$services/observability/sentry-user';
+ import Seneschal                    from '$services/seneschal/plugin';
+ import TabClerk                     from '$services/tabs/tab-clerk';
+>>>>>>> conflict 1 of 1 ends
+
+// concatenate all the routes modules, ending with the 404 page if no route has been matched.
+const routes = concat(
+	routesActions,
+	routesADGroups,
+	routesApp,
+	routesArticles,
+	routesCommon,
+	routesCompanies,
+	routesControlPlans,
+	routesContracts,
+	routesControls,
+	routesControlsLegacy,
+	routesCurriculaVitae,
+	routesDocuments,
+	routesDoors,
+	routesFlow,
+	routesGuarantees,
+	routesImprovementSuggestions,
+	routesJournal,
+	routesKonradContent,
+	routesLanguages,
+	routesMeasurement,
+	routesMeetings,
+	routesNonconformities,
+	routesPerformanceReviews,
+	routesPlazas,
+	routesPresentations,
+	routesProcessDeviations,
+	routesProjectManagement,
+	routesProcesses,
+	routesRemarks,
+	routesReports,
+	routesRequirements,
+	routesRights,
+	routesStandards,
+	routesSubcontracts,
+	routesSuppliers,
+	routesSystems,
+	routesTenders,
+	routesTests,
+	routesUpdates,
+	routesUsers,
+	routes2d3d,
+	routes2d3dSindri,
+	routesBcf,
+	routesChecklists,
+	routesDecisions,
+
+	// keep projects at bottom as it has the base project/:projectId route.
+	routesProjects,
+
+	// finally insert the 404 rules.
+	[
+		{
+			path      : '/:pathMatch(.*)*',
+			name      : 'not-found',
+			component : () => import( /* webpackChunkName: "four-oh-four" */ '$views/app/four-oh-four.vue' ),
+		},
+		{
+			path      : '/:pathMatch(.*)',
+			name      : 'not-found',
+			component : () => import( /* webpackChunkName: "four-oh-four" */ '$views/app/four-oh-four.vue' ),
+		},
+	]
+);
+
+// create an eventbus to be used by the router later
+const $eventBus : DefEventBus = EventBus.bus();
+
+// create the router object.
+const router : Router = createRouter( {
+	history : createWebHistory(),
+	routes,
+} );
+
+// Ugly hack to ensure that we can detect when router.push is run, so we can set a flag, and for replace and go as well
+const oldPush = router.push.bind( router );
+router.push = ( ...args ) => {
+	Breadcrumbs.isInternalNavigation = true;
+	return oldPush( ...args );
+};
+const oldReplace = router.replace.bind( router );
+router.replace = ( ...args ) => {
+	Breadcrumbs.isInternalNavigation = true;
+	return oldReplace( ...args );
+};
+const oldGo = router.go.bind( router );
+router.go = ( ...args ) => {
+	Breadcrumbs.isInternalNavigation = true;
+	return oldGo( ...args );
+};
+
+// create the default bootstrapper object
+const bootstrapper : DefRouterBootstrapper = {
+	authenticationPromise      : null,  // shared in-flight auth attempt; closes the overlapping-navigation race.
+	entryRoute                 : null,
+	hasChangedProject          : false,
+	hasAttemptedAuthentication : false,  // checks if the initial ./me has been attempted.
+	isFirstVisit               : true,
+	routesAlwaysOpen           : [
+		'help',
+	],
+	routesWithoutAuthentication : [       // these routes are available without authentication
+		'login-error',
+		'missing-user',
+		'login-form',
+		'login-troubleshooter',
+	],
+	routesWithCrossProjectAccess : [
+		'nonconformities-complaint-edit',
+		'nonconformities-env-edit',
+		'nonconformities-quality-edit',
+		'nonconformities-hse-edit',
+		'project-details',
+		'projects-edit',
+		'projects-subcontracts-list',
+		'projects-view',
+		'tenders-edit',
+		'tenders-inquiry-list',
+		'tenders-statistics-list',
+		'tenders-statistics-edit',
+		'projects-view-resourceprognose',
+		'projects-view-attribute',
+		'suppliers-all',
+		'projects-reference',
+	],
+	skipGDPR  : false,  // developer setting to skip the GDPR screen
+	skipLogin : false,  // developer setting to skip the login screen
+};
+
+// expose the bootstrapper object to the hent object.
+window.hent = window.hent || {} as DefHentInterface;
+window.hent.bootstrapper = window.hent.bootstrapper || bootstrapper;
+
+/**
+ * Global beforeEach navigation guard - triggers before each navigation attempt.
+ * !TODO: Find the correct type for to and from.
+ *
+ * @param  {RouteLocationNormalized} to   The route location we're attemting to reach.
+ * @param  {RouteLocationNormalized} from The route location we're coming from.
+ * @param  {Function}                next A navigation guard for what's coming next.
+ * @return {void}
+ */
+router.beforeEach( ( to : RouteLocationNormalized, from : RouteLocationNormalized ) => {
+
+	if ( bootstrapper.hasAttemptedAuthentication
+		&& Authentication.getActiveAccount()
+		&& Authentication.isRefreshTokenExpiring() ) {
+		void Authentication.loginSilent().catch( () => { /* navigation handles outcome */ } );
+	}
+
+	// Some evil entities are messing with our links, transforming # into %23, so we fix that here
+	if ( to.path.includes( '%23' ) ) {
+		const path = to.path.substring( 0, to.path.indexOf( '%23' ) );
+		const hash = to.path.substring( to.path.indexOf( '%23' ) + 3 );
+		router.replace( {
+			path,
+			hash : `#${ hash }`,
+		} );
+		return false;
+	}
+
+	// special causes for hashes triggering hash-changes, they should never run on first visit.
+	if ( !bootstrapper.isFirstVisit ) {
+		// stop the execution silently, we do not need to navigate at all.
+		if ( to.fullPath === from.fullPath ) {
+			return false;
+		}
+
+		// create references to the path without the hash.
+		const toHref = to.href.includes( '#' )
+			? to.href.substring( 0, to.href.indexOf( '#' ) )
+			: to.href;
+		const fromHref = from.href && from.href.includes( '#' )
+			? from.href.substring( 0, from.href.indexOf( '#' ) )
+			: from.href || '';
+
+		// if the non-hash references were equal, we're navigating to a hash, so we can stop the execution silently.
+		if ( toHref === fromHref ) {
+			return Promise.resolve();
+		}
+	}
+
+	// Read out hashes from the url
+	Hashes.setup( to.hash );
+
+	if ( bootstrapper.isFirstVisit ) {
+		// con sole log( `This is first visit, your desired destination was ${ to.name }.` );
+		bootstrapper.entryRoute = to;
+	}
+
+	return new Promise( ( resolve ) => {
+		// con sole log( 'On your path you had to pass several guards.' );
+
+		// clean dirty variables from the previous route/state, and initiate our new guards.
+		cleanDirtyVars( to, from );
+		const guards = new RouterGuards( to, from, bootstrapper );
+
+		// Run the gauntlet.
+		Promise.resolve()
+
+			// check msal - if success - attempt to get ./me.
+			.then( guards.performGuardAuthentication.bind( guards ) )
+
+			// if there is no me object, force user to login (and validate gdpr if needed).
+			.then( guards.performGuardLogin.bind( guards ) )
+
+			// check project variables and do necessary project calls.
+			.then( guards.performGuardProject.bind( guards ) )
+
+			// make sure the path is a valid uri
+			.then( guards.performGuardAllowedUri.bind( guards ) )
+
+			// finish up - or redirect the user to a safe next.
+			.then(
+				( /* result */ ) => {
+					// con sole log( 'You made it past all the guards in the dungeon!' );
+					resolve( true );
+				},
+				( reason ) => {
+					// con sole log( 'A guard caught you because', reason );
+					resolve( reason );
+				}
+			)
+
+			// hard fail!
+			.catch( ( error ) => {
+
+				// con sole log( 'Hard fail, there was no dungeon, there was no gauntlet.' );
+				throw error;
+			} );
+
+	} );
+} );
+
+/**
+ * Global beforeResolve guard - sends a link aimed at a lone meeting case or instance on to the
+ * meeting's own detail view, where the redesigned module renders it.
+ *
+ * A global hook, not the two routes' own `beforeEnter`: Vue Router skips `beforeEnter` when a
+ * navigation only changes params on the record already matched, so a second child link would stay
+ * on the legacy view. Runs in `beforeResolve` so the gauntlet above has already authenticated the
+ * fetch the redirect makes.
+ *
+ * @param  {RouteLocationNormalized}               to The route location we're attempting to reach.
+ * @return {Promise<RouteLocationRaw | undefined>}    A redirect onto the meeting, or nothing to let the navigation stand.
+ */
+router.beforeResolve( ( to : RouteLocationNormalized ) => redirectMeetingChildToMeeting( to ) );
+
+/**
+ * Global afterEach navigation guard - triggers after each navigation attempt.
+ *
+ * @param  {RouteLocationNormalized} to      The route location we're attempting to reach.
+ * @param  {RouteLocationNormalized} from    The route location we're coming from.
+ * @param  {NavigationFailure}       failure Set when the navigation was aborted, cancelled or duplicated.
+ * @return {void}
+ */
+router.afterEach( ( to: RouteLocationNormalized, from: RouteLocationNormalized, failure?: NavigationFailure | void ) => {
+	// create references to the path without the hash.
+	const toHref = to.href.includes( '#' )
+		? to.href.substring( 0, to.href.indexOf( '#' ) )
+		: to.href;
+	const fromHref = from.href && from.href.includes( '#' )
+		? from.href.substring( 0, from.href.indexOf( '#' ) )
+		: from.href || '';
+
+	// if the non-hash references were equal, we're navigating to a hash, so we can stop the execution silently.
+	if ( !bootstrapper.isFirstVisit && toHref === fromHref ) {
+		return;
+	}
+
+	// from this point on we are actually navigating to a new page, so any clean-up or setup should be done here.
+
+	// tear down the departed project's flow controller. This belongs here rather than in
+	// beforeEach: a guard that rejects or redirects would otherwise leave a still-mounted
+	// flow view holding a controller whose caches are cleared and whose watchers are stopped.
+	// `failure` excludes navigations vue-router fires afterEach for but that never completed
+	// (aborted, cancelled, duplicated) — nothing was departed, so nothing may be torn down.
+	const projectIdFlowTeardown = resolveFlowTeardownProjectId( to, from, failure );
+	if ( projectIdFlowTeardown ) {
+		FlowManager.destroyFlow( projectIdFlowTeardown );
+	}
+
+	// scope-tag Sentry events with the project id (cleared on non-project routes).
+	setSentryProjectTag( to );
+
+	// set a non-stale document.title baseline from the route's meta before the
+	// destination view's created() runs. meta.titleLabel() supplies the translated,
+	// user-facing title; meta.title is the untranslated GA4 fallback for routes without
+	// one. Views that call Meta.setPageTitle() later in created() naturally override
+	// this with a richer (project-aware) title. We set it directly rather than
+	// importing Meta to avoid a router -> meta -> router import cycle.
+	const pageTitle = to.meta.titleLabel?.() ?? to.meta.title;
+	if ( pageTitle ) {
+		document.title = [ pageTitle, APP_CONFIG.TITLE, ].join( ' - ' );
+	}
+
+	// inform the application that we're navigating to a new route.
+	$eventBus.$emit( 'navigate:route', { type: 'fake' as const, }, {
+		from,
+		to,
+	} );
+
+	// clear the jacket on successful routing
+	// !TODO: Move jacket to the dock.
+	window.hent.$jacket.clear();
+
+	// ask the breadcrumbs to build a new route.
+	window.hent.$breadcrumbs.build( to );
+
+	// if this is a successful route to a non-authentication route, remove first visit flag.
+	if ( typeof to.name !== 'string' || !bootstrapper.routesWithoutAuthentication.includes( to.name ) ) {
+		bootstrapper.isFirstVisit = false;
+	}
+
+	// if the navigation contains hashes representing tabs, we should hydrate the TabClerk with those.
+	TabClerk.hydrateFromHashes();
+
+} );
+
+/**
+ * Global onError navigation guard - triggers when an error occurs during navigation.
+ *
+ * @return {void}
+ */
+router.onError( ( error : unknown ) : void => {
+	// A chunk-load failure means this client is on an old bundle whose hashed
+	// chunk filenames no longer exist after a deploy. A plain location.reload()
+	// does NOT activate a waiting service worker, so it can re-fetch the same
+	// stale manifest and loop. Route it into the guarded self-heal path instead,
+	// which promotes the waiting SW before reloading and is rate-limited by the
+	// SELF_HEAL_WINDOW_MS sessionStorage guard so it can never spiral.
+	if ( VersionChecker.isChunkLoadError( error ) ) {
+		// heal() returns false when the cooldown window already blocked a reload this
+		// session — the client is genuinely stuck on a dead route, so say so honestly
+		// instead of leaving it silently broken.
+		if ( !VersionChecker.heal() ) {
+			nagRestart( () => window.hent.$pgettext( 'user-feedback', 'Part of HENT Core failed to load. Restart the application to continue.' ), false );
+		}
+		return;
+	}
+
+	nagRestart( () => window.hent.$pgettext( 'user-feedback', 'HENT Core has been updated. Your work will not be saved until you restart the application.' ), true );
+} );
+
+/**
+ * Raise the restart nag, falling back to a bare body message if even the nag plugin is gone.
+ *
+ * @param  {Function} content  Produces the user-facing message — called inside the guard so a gutted window.hent still reaches the failsafe.
+ * @param  {boolean}  closable Whether the user may dismiss the nag.
+ * @return {void}
+ */
+function nagRestart( content : () => string, closable : boolean ) : void {
+	try {
+		window.hent.$nag.add( {
+			content : content(),
+			type    : 'DANGER',
+			closable,
+			link    : {
+				text : window.hent.$pgettext( 'button-label', 'Restart application' ),
+				fn   : () => { void VersionChecker.refresh(); },
+			},
+		} );
+	} catch ( _error ) {
+		// nuclear option failsafe in case the previous failsafe also fails.
+		// please never make this more complicated, do not use pgettext.
+		window.document.body.textContent = 'Something has gone wrong with HENT Core. Please restart the application.';
+	}
+}
+
+/**
+ * Cleans out dirty references we do not want to keep when navigating.
+ *
+ * @param  {RouteLocationNormalized} to   The route location we're coming from.
+ * @param  {RouteLocationNormalized} from The route location we're attempting to reach.
+ * @return {void}
+ */
+function cleanDirtyVars( to: RouteLocationNormalized, from: RouteLocationNormalized ) : void {
+
+	// if router path changes at all, close all drawers and collectionstates, but make sure
+	// to remove any trailing slashes.
+	// Skip this when Seneschal is doing an internal URL sync (e.g. pushing/stripping a
+	// drawerKind segment) — the drawer was just opened via the URL change, not stranded by it.
+	const isPathChange = to.path.replace( /\/+$/, '' ) !== from.path.replace( /\/+$/, '' );
+	if ( isPathChange && !Seneschal.isInternalUrlSync ) {
+		//		Hashes.clear();
+		window.hent.$drawers.clear();
+		window.hent.$collectionStates.clear();
+
+		// Clean up semi-transparent grey overlay to the screen
+		document.querySelectorAll( '.legacy-drawer-scrim, .legacy-smart-drawer' ).forEach( ( el ) => {
+			el.remove();
+		} );
+	}
+
+	// locate both new and old projectId. cast to string because legacy sometimes uses an integer.
+	// when the route has no :projectId segment, normalise to null instead of the literal "undefined".
+	const projectIdNew = to.params.projectId
+		? String( to.params.projectId )
+		: null;
+	const projectIdOld = store.tidbits.projectId;
+
+	// if the project has changed - clean several project references used by legacy.
+	if ( projectIdNew !== projectIdOld ) {
+		const dirtyLegacyReferences = [
+			'lastUsedFirm',
+			'lastUsedResponsibleUser',
+			'lastUsedTopic',
+			'lastUsedControl',
+			'lastUsedReferenceId',
+		];
+
+		for ( let i = 0; i < dirtyLegacyReferences.length; i++ ) {
+			localStorage.removeItem( dirtyLegacyReferences[ i ] );
+		}
+	}
+}
+
+export default router;

@@ -206,7 +206,12 @@ local function get_all_conflicts(on_done)
 
 		local files = {}
 		for _, line in ipairs(result) do
-			local path = line:match("^(.-)%s%s%s%s")
+			-- `jj resolve --list` pads paths to align columns, so the separator
+			-- can be a single space. Anchor on the description instead.
+			local path = line:match("^(.-)%s+%d+%-sided conflict")
+			if path then
+				path = path:gsub('^"(.*)"$', "%1")
+			end
 			if path then
 				table.insert(files, path)
 			end
