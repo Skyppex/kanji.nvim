@@ -234,6 +234,7 @@ local function get_all_conflicts(on_done)
 	end)
 end
 
+--- @param on_done function
 function M.conflicts(on_done)
 	get_all_conflicts(on_done)
 end

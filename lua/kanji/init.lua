@@ -10,6 +10,8 @@
 --- @field blame_buffer_toggle fun()
 --- @field show_revset_info fun()
 --- @field close_revset_info fun()
+--- @field conflicts fun(on_done: fun(conflicts: KanjiConflict[]))
+--- @field conflicts_to_qf fun()
 
 --- @type KanjiApi
 local M = {}
@@ -275,8 +277,9 @@ function M.close_revset_info()
 	inspect.close()
 end
 
-function M.conflicts()
-	conflicts.conflicts()
+--- @param on_done fun(conflicts: KanjiConflict[])
+function M.conflicts(on_done)
+	conflicts.conflicts(on_done)
 end
 
 function M.conflicts_to_qf()
