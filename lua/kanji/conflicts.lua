@@ -195,7 +195,9 @@ end
 
 --- @param on_done fun(conflicts: KanjiConflict[])
 local function get_all_conflicts(on_done)
-	repo.resolve_list(function(result)
+	-- `resolve_list` calls back from a job's exit handler (fast event context),
+	-- so hop to the main loop before touching any API or invoking user callbacks.
+	repo.resolve_list(vim.schedule_wrap(function(result)
 		if not result or #result == 0 then
 			if on_done then
 				on_done({})
@@ -231,7 +233,7 @@ local function get_all_conflicts(on_done)
 		if on_done then
 			on_done(all_conflicts)
 		end
-	end)
+	end))
 end
 
 --- @param on_done function
@@ -253,11 +255,8 @@ function M.conflicts_to_qf()
 		end
 
 		if #qf_items > 0 then
-			vim.schedule(function()
-				vim.notify(vim.inspect(qf_items))
-				vim.fn.setqflist(qf_items, "r")
-				vim.cmd("copen")
-			end)
+			vim.fn.setqflist(qf_items, "r")
+			vim.cmd("copen")
 		end
 	end)
 end
