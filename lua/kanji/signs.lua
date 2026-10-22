@@ -2,9 +2,9 @@ local M = {}
 
 local diff = require("kanji.diff")
 
-vim.api.nvim_command("highlight link KanjiDiffAdd DiffAdd")
-vim.api.nvim_command("highlight link KanjiDiffChange DiffChange")
-vim.api.nvim_command("highlight link KanjiDiffDelete DiffDelete")
+vim.api.nvim_set_hl(0, "KanjiDiffAdd", { default = true, link = "DiffAdd" })
+vim.api.nvim_set_hl(0, "KanjiDiffChange", { default = true, link = "DiffChange" })
+vim.api.nvim_set_hl(0, "KanjiDiffDelete", { default = true, link = "DiffDelete" })
 
 local HL_MAP = {
 	add = "KanjiDiffAdd",
