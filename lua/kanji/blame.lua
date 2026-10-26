@@ -62,7 +62,6 @@ local function disable_scrollbind()
 end
 
 local function enable_scrollbind()
-	vim.notify("enabling scrollbind")
 	if M.state.buffer.blame_win and vim.api.nvim_win_is_valid(M.state.buffer.blame_win) then
 		vim.api.nvim_set_option_value("scrollbind", true, { win = M.state.buffer.blame_win })
 	end
@@ -433,6 +432,14 @@ function M._update_buffer_blame_content(blame_lines, line_info)
 	end
 
 	M.write_blame_buffer_content(blame_bufnr, blame_lines, line_info)
+
+	-- rewriting the blame buffer resets its topline, and switching buffers in the source window
+	-- restores that buffer's view without notifying scrollbind, so realign from the source window
+	if M.state.buffer.source_win and vim.api.nvim_win_is_valid(M.state.buffer.source_win) then
+		vim.api.nvim_win_call(M.state.buffer.source_win, function()
+			vim.cmd.syncbind()
+		end)
+	end
 
 	vim.cmd.redraw()
 end

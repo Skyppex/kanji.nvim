@@ -16,6 +16,9 @@ function M.refresh(bufnr)
 	repo.get_diff(relative_path, function(diff_output)
 		local sign_list = signs.get_signs(diff_output)
 		vim.schedule(function()
+			if not vim.api.nvim_buf_is_valid(bufnr) then
+				return
+			end
 			signs.clear(bufnr)
 			if #sign_list > 0 then
 				signs.place(bufnr, sign_list)

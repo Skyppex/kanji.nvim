@@ -45,7 +45,8 @@ function M.parse(diff_output)
 	local line_in_file = 1
 
 	for _, line in ipairs(diff_output) do
-		local old_start, new_start = line:match("^@@ %-(%d+),?%d* %+(%d+),?%d* @@$")
+		-- hunk headers may be followed by function context, e.g. `@@ -34,29 +34,28 @@ function foo() {`
+		local old_start, new_start = line:match("^@@ %-(%d+),?%d* %+(%d+),?%d* @@")
 		if old_start then
 			table.insert(hunks, {
 				old_start = tonumber(old_start),
