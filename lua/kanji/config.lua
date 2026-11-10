@@ -6,6 +6,7 @@ local M = {}
 --- @field hooks KanjiHooksOpts
 --- @field blame KanjiBlameOpts
 --- @field inspect KanjiInspectOpts
+--- @field timeout number Timeout in milliseconds for each jj command.
 
 --- @class KanjiSignsOpts
 --- @field add KanjiSignOpts
@@ -60,6 +61,7 @@ M.defaults = {
 		enabled = false,
 	},
 	hooks = {},
+	timeout = 500,
 	inspect = {
 		winopts = {
 			border = "rounded",
@@ -114,6 +116,10 @@ function M.configure(user_opts)
 		if user_opts.blame.enabled ~= nil then
 			config.blame.enabled = user_opts.blame.enabled
 		end
+	end
+
+	if user_opts.timeout then
+		config.timeout = user_opts.timeout
 	end
 
 	if user_opts.inspect and user_opts.inspect.winopts then
