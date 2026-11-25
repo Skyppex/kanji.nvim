@@ -23,6 +23,7 @@ function M.refresh(bufnr)
 			if #sign_list > 0 then
 				signs.place(bufnr, sign_list)
 			end
+			require("kanji.inline").render(bufnr, diff_output)
 		end)
 	end)
 end

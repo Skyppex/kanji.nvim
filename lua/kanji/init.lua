@@ -12,6 +12,7 @@
 --- @field close_revset_info fun()
 --- @field conflicts fun(on_done: fun(conflicts: KanjiConflict[]))
 --- @field conflicts_to_qf fun()
+--- @field inline_hunks_toggle fun()
 
 --- @type KanjiApi
 local M = {}
@@ -24,6 +25,7 @@ local utils = require("kanji.utils")
 local repo = require("kanji.repo")
 local signs = require("kanji.signs")
 local conflicts = require("kanji.conflicts")
+local inline = require("kanji.inline")
 
 --- @param opts KanjiOpts
 function M.setup(opts)
@@ -284,6 +286,10 @@ end
 
 function M.conflicts_to_qf()
 	conflicts.conflicts_to_qf()
+end
+
+function M.inline_hunks_toggle()
+	inline.toggle()
 end
 
 return M
